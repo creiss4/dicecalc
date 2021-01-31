@@ -1,20 +1,27 @@
+from discord import Intents
+from discord.ext.commands import Bot, Command
 
-import discord
-from discord.ext import commands
+class Dicebot:
 
-intents = discord.Intents().all()
+    token:str
+    prefix:str
+    invocation_count:int
 
-client = commands.Bot(command_prefix = "d!", case_insensitive = True, intents=intents)
-#token contained in separate file, unique token that is required for the bot to run
-token = open("token.txt", "r").read()
+    def __init__(self, token:str=None, prefix:str='d!'):
+        self.token = token
+        self.prefix = prefix
+        self.invocation_count = 0
 
-@client.event
-async def on_ready():
-    print("Ready")
+    def connect(self) -> None:
+        intents = Intents().all()
+        client:Bot = Bot(command_prefix=self.prefix, case_insensitive=True, intents=intents)
+        client.event(self.on_ready)
+        client.add_command(Command(self.foo, name='foo'))
+        client.run(self.token)
 
-@client.command()
-async def foo(ctx):
-    await ctx.send("I'm ready!")
+    async def foo(self, ctx):
+        self.invocation_count += 1
+        await ctx.send("I'm ready!")
 
-
-client.run(token)
+    async def on_ready(self):
+        pass

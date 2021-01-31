@@ -1,0 +1,1 @@
+from .dicebot import Dicebot
