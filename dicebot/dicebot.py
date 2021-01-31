@@ -6,18 +6,19 @@ class Dicebot:
     token:str
     prefix:str
     invocation_count:int
+    bot:Bot
 
     def __init__(self, token:str=None, prefix:str='d!'):
         self.token = token
         self.prefix = prefix
         self.invocation_count = 0
+        bot:Bot = Bot(command_prefix=self.prefix, case_insensitive=True, intents=Intents().all())
+        bot.event(self.on_ready)
+        bot.add_command(Command(self.foo, name='foo'))
+        self.bot = bot
 
     def connect(self) -> None:
-        intents = Intents().all()
-        client:Bot = Bot(command_prefix=self.prefix, case_insensitive=True, intents=intents)
-        client.event(self.on_ready)
-        client.add_command(Command(self.foo, name='foo'))
-        client.run(self.token)
+        self.bot.run(self.token)
 
     async def foo(self, ctx):
         self.invocation_count += 1
