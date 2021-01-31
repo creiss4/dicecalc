@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="dicebot", # Replace with your own username
-    namespace = ["dicebot"]
+    namespace = ["dicebot"],
     version="0.0.1",
     author="Christina Reiss",
     author_email="creiss444@gmail.com",
