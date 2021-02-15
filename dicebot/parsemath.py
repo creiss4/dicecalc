@@ -90,7 +90,7 @@ class MathParser:
         number.setName('Number')
         ident = Word(alphas, alphanums + "_$")
         ident.setName('Ident')
-        dice = Regex(r'\d?[dD]\d+')
+        dice = Regex(r'\d*[dD][1-9]\d*')
         dice.setName('Dice')
         plus, minus, lt, le, gt, ge, eq, ne, or_, and_ = map(Literal, [
             '+', '-', '<', '<=', '>', '>=', '==', '!=', 'or', 'and'])
