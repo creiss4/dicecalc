@@ -1,9 +1,10 @@
+from typing import List
 from sys import prefix
 from discord import Intents
-from discord.ext.commands import Bot, Command
+from discord.ext.commands import Bot, Command, when_mentioned_or
 
 from discord.message import Message
-from parsemath import MathParser 
+from .parsemath import MathParser, DiceRolls
 
 class Dicebot:
 
@@ -14,24 +15,45 @@ class Dicebot:
 
     def __init__(self, token:str=None, prefix:str='d!'):
         self.token = token
-        self.prefix = prefix
+        self.prefix = when_mentioned_or(prefix)
+
         self.invocation_count = 0
         bot:Bot = Bot(command_prefix=self.prefix, case_insensitive=True, intents=Intents().all())
         bot.event(self.on_ready)
-        bot.add_command(Command(self.foo, name='foo'))
+        bot.event(self.on_message)
         self.bot = bot
 
     def connect(self) -> None:
         self.bot.run(self.token)
 
-    async def foo(self, ctx):
-        self.invocation_count += 1
-        await ctx.send("I'm ready!")
-
     async def on_ready(self):
         pass
 
+    def format_message(self, total: int, rolls: List[DiceRolls]):
+        lines = [f'Total: {total}']
+
+        for roll in rolls:
+            results = ", ".join(list(map(str, roll.results)))
+            lines.append(f'{roll.roll}: {results}')
+
+        body = "\n".join(lines)
+
+        if len(body) > 1900:
+            body = body[:1900]
+
+        return f'```\n{body}\n```'
+
     async def on_message(self, message: Message):
+        """
+        Input of "3d20 + 2d12"
+
+        ```
+        Total: 34
+        3d20: 2, 5, 5
+        2d12: 10, 12
+        ```
+        """
+
         if message.author.bot:
             return
         for prefix in self.prefix(self.bot, message):
@@ -39,5 +61,8 @@ class Dicebot:
             content = message.content.replace(prefix, "", 1)
             p = MathParser()
             value = p.eval(content)
-            await message.channel.send(value)
+
+            response = self.format_message(value, p.dice_roles)
+
+            await message.channel.send(response)
             break

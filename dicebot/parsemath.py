@@ -203,4 +203,4 @@ class MathParser:
             raise
 
 
-__all__ = ['MathParser']
+__all__ = ['MathParser', 'DiceRolls']
