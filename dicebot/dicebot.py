@@ -1,5 +1,9 @@
+from sys import prefix
 from discord import Intents
 from discord.ext.commands import Bot, Command
+
+from discord.message import Message
+from parsemath import MathParser 
 
 class Dicebot:
 
@@ -26,3 +30,14 @@ class Dicebot:
 
     async def on_ready(self):
         pass
+
+    async def on_message(self, message: Message):
+        if message.author.bot:
+            return
+        for prefix in self.prefix(self.bot, message):
+            if not message.content.startswith(prefix): continue
+            content = message.content.replace(prefix, "", 1)
+            p = MathParser()
+            value = p.eval(content)
+            await message.channel.send(value)
+            break
