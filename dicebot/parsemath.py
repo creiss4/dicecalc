@@ -192,15 +192,9 @@ class MathParser:
     def eval(self, expression: str) -> Any:
         self.stack.clear()
         self.dice_roles.clear()
-        try:
-            self.expr.parseString(expression, parseAll=True)
-            val = self._eval_stack()
-            return val
-        except ParseException as e:
-            err_type: str = type(e).__name__
-            log.warn(
-                f'Encountered {err_type} while evaluating "{expression}": {e}')
-            raise
+        self.expr.parseString(expression, parseAll=True)
+        val = self._eval_stack()
+        return val
 
 
 __all__ = ['MathParser', 'DiceRolls']
